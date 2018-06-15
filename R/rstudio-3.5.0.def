@@ -1,0 +1,88 @@
+Bootstrap: docker
+FROM: r-base:3.4.4
+
+%help
+  RStudio Desktop version 1.1.442
+  R version 3.4.4 (2018-03-15) -- "Someone to Lean On"
+
+  Usage:
+  $ singularity run rstudio.3.4.4.simg [args]
+  $ singularity run --app R rstudio.3.4.4.simg [args]
+  $ singularity run --app Rscript rstudio.3.4.4.simg [args]
+  $ singularity run --app rstudio rstudio.3.4.4.simg
+
+%setup
+
+%files
+
+%labels
+  Maintainer Michael J. Stealey
+  Maintainer_Email stealey@renci.org
+  RStudio_Version 1.1.442
+  R_Version 3.4.4
+
+%environment
+  RSTUDIO_VERSION=1.1.442
+  R_BASE_VERSION=3.4.4
+  LC_ALL=en_US.UTF-8
+  LANG=en_US.UTF-8
+
+%post
+  export RSTUDIO_VERSION=1.1.442
+  apt-get update
+  apt-get install -y \
+    wget \
+    gdebi-core \
+    libxslt1-dev \
+    qt5-default \
+    mesa-utils \
+    libgl1-mesa-glx \
+    libgl1-mesa-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    default-jre \
+    default-jdk
+  wget \
+    --no-verbose \
+    "https://download1.rstudio.org/rstudio-xenial-${RSTUDIO_VERSION}-amd64.deb"
+  gdebi -n rstudio-xenial-${RSTUDIO_VERSION}-amd64.deb
+  rm -f rstudio-xenial-${RSTUDIO_VERSION}-amd64.deb
+  rm -rf /var/lib/apt/lists/*
+  
+  R -e "install.packages(\"rJava\")"
+  R -e "install.packages(\"xlsx\")"
+  R -e "install.packages(\"stringi\")"
+  R -e "install.packages(\"Matrix\")"
+  R -e "install.packages(\"MASS\")"
+  R -e "install.packages(\"cluster\")"
+  R -e "install.packages(\"robust\")"
+  R -e "install.packages(\"survival\")"
+  R -e "install.packages(\"foreign\")"
+  R -e "install.packages(\"nlme\")"
+  R -e "install.packages(\"glue\")"
+  R -e "install.packages(\"knitr\")"
+  R -e "install.packages(\"Hmisc\")"
+  R -e "install.packages(\"tidyverse\")"
+  R -e "install.packages(\"gplots\")"
+  R -e "install.packages(\"shiny\")"
+  R -e "install.packages(\"shinyjs\")"
+  R -e "install.packages(\"plotly\")"
+  R -e "install.packages(\"d3heatmap\")"
+
+
+
+%apprun R
+  exec R "${@}"
+
+%apprun Rscript
+  exec Rscript "${@}"
+
+%apprun rstudio
+  exec rstudio "${@}"
+
+%runscript
+  exec "${@}"
+
+%test
+  exec R --version
+
