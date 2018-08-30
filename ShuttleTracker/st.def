@@ -1,0 +1,20 @@
+Bootstrap: docker
+From: ubuntu
+
+%runscript
+    exec echo "Welcome to the ShuttleTracker container!"
+
+%files
+
+%environment
+
+%labels
+    AUTHOR mkochan@ippt.pan.pl
+
+%post
+    apt-get update
+    apt-get -y install git cmake g++-8 libopencv-dev libboost-all-dev qtbase5-dev qtbase5-dev-tools qttools5-dev qtscript5-dev
+    mkdir -p /opt/local/src
+    (cd /opt/local/src && git clone http://pmbm.ippt.pan.pl/code/shuttletracker.git ; sed -i s/#%// shuttletracker/CMakeLists.txt)
+    (cd /opt/local/src/shuttletracker && mkdir build && cd build && cmake .. -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/local/ && make -j4 && make install)
+
