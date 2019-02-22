@@ -9,4 +9,4 @@ IMLOC=/opt/local/cellprofiler/cp3.1.8-ubuntu18.04.simg
 BNDDIR="-B /scratch -B /mnt/imaging.data"
 
 # execute "runscript" section of the image
-interactive-job singularity run $BNDDIR $IMLOC $@
+slurm-or-interactive singularity run $BNDDIR $IMLOC $@
