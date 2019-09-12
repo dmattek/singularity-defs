@@ -1,0 +1,66 @@
+Bootstrap: docker
+FROM: r-base:3.6.1
+
+%help
+  R version 3.6.1 (2019-07-05) -- "Action of the Toes"  
+
+  Usage:
+  $ singularity run rstudio.3.6.1.simg [args]
+  $ singularity run --app R rstudio.3.6.1.simg [args]
+  $ singularity run --app Rscript rstudio.3.6.1.simg [args]
+  $ singularity run --app rstudio rstudio.3.6.1.simg
+
+%setup
+
+%files
+
+%labels
+  Modified from Michael J. Stealey
+  https://github.com/mjstealey/rstudio
+  RStudio_Version 1.2.1335
+  R_Version 3.6.1
+
+%environment
+  RSTUDIO_VERSION=1.2.1335
+  R_BASE_VERSION=3.6.1
+  LC_ALL=en_US.UTF-8
+  LANG=en_US.UTF-8
+
+%post
+  export RSTUDIO_VERSION=1.2.1335
+  apt-get update
+  apt-get install -y \
+    wget \
+    gdebi-core \
+    libxslt1-dev \
+    qt5-default \
+    mesa-utils \
+    libgl1-mesa-glx \
+    libgl1-mesa-dev \
+    libcurl4-openssl-dev \
+    libssl-dev \
+    default-jre \
+    default-jdk
+  wget \
+    --no-verbose \
+    "https://download1.rstudio.org/desktop/debian9/x86_64/rstudio-${RSTUDIO_VERSION}-amd64.deb"
+  gdebi -n rstudio-${RSTUDIO_VERSION}-amd64.deb
+  rm -f rstudio-${RSTUDIO_VERSION}-amd64.deb
+  rm -rf /var/lib/apt/lists/*
+  
+
+%apprun R
+  exec R "${@}"
+
+%apprun Rscript
+  exec Rscript "${@}"
+
+%apprun rstudio
+  exec rstudio "${@}"
+
+%runscript
+  exec "${@}"
+
+%test
+  exec R --version
+
