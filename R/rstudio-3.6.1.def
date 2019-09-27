@@ -31,16 +31,19 @@ FROM: r-base:3.6.1
   apt-get update
   apt-get install -y \
     wget \
+    libssl-dev \
+    libcurl4-openssl-dev \
+    unixodbc-dev \
+    libxml2-dev \
     gdebi-core \
     libxslt1-dev \
     qt5-default \
     mesa-utils \
     libgl1-mesa-glx \
     libgl1-mesa-dev \
-    libcurl4-openssl-dev \
-    libssl-dev \
     default-jre \
     default-jdk
+
   wget \
     --no-verbose \
     "https://download1.rstudio.org/desktop/debian9/x86_64/rstudio-${RSTUDIO_VERSION}-amd64.deb"

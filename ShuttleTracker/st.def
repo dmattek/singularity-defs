@@ -1,20 +1,41 @@
 Bootstrap: docker
 From: ubuntu
 
+%help
+  This is a container with ShuttleTracker and required dependencies.
+  Available ENTRYPOINTS for singularity run --app xxx st.simg:
+  st - ShuttleTracker with GUI
+  st-nogui - ShuttleTracker run via xvfb (virtual framebuffer)
+  tiff_expander - python script to convert tiff stacks to ST format
+
 %runscript
-    exec echo "Welcome to the ShuttleTracker container!"
+  exec echo "Try running with --app st/st-nogui/tiff_expander"
+
+%apprun st
+  exec /opt/local/bin/ShuttleTracker "$@"
+
+%apprun st-nogui
+  exec xvfb-run /opt/local/bin/ShuttleTracker "$@"
+
+%apprun tiff_expander
+  exec python3 /opt/local/share/shuttletracker/support/tiff_expander.py "$@"
+
 
 %files
 
 %environment
 
 %labels
-    AUTHOR mkochan@ippt.pan.pl
+  ShuttleTracker 0.7.2
+  AUTHOR mkochan@ippt.pan.pl
 
 %post
     apt-get update
-    apt-get -y install git cmake g++-8 libopencv-dev libboost-all-dev qtbase5-dev qtbase5-dev-tools qttools5-dev qtscript5-dev
-    mkdir -p /opt/local/src
-    (cd /opt/local/src && git clone http://pmbm.ippt.pan.pl/code/shuttletracker.git ; sed -i s/#%// shuttletracker/CMakeLists.txt)
-    (cd /opt/local/src/shuttletracker && mkdir build && cd build && cmake .. -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/local/ && make -j4 && make install)
-
+    apt-get -y --no-install-recommends install git cmake g++-8
+    apt-get -y --no-install-recommends install libopencv-dev libboost-all-dev qtbase5-dev qtbase5-dev-tools qttools5-dev qtscript5-dev 
+    apt-get -y --no-install-recommends install xvfb mesa-utils libgl1-mesa-glx libgl1-mesa-dri fonts-cantarell
+    apt-get -y --no-install-recommends install nano
+    apt-get -y --no-install-recommends install python3-numpy python3-pil python3-pandas python3-matplotlib
+    (mkdir -p /opt/local/src && cd /opt/local/src && git clone http://pmbm.ippt.pan.pl/code/shuttletracker.git && cd shuttletracker && mkdir build && cd build && cmake .. -DCMAKE_CXX_COMPILER=g++-8 -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=/opt/local/ && make -j4 && make install && rm -fR ../build/*)
+    apt-get -y purge git cmake g++-8
+    chmod 666 /opt/local/share/shuttletracker/config/settings.ini
