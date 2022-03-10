@@ -9,7 +9,7 @@ From: ubuntu
 %help
   This is a container with CellProfiler and required dependencies.
 
-%label
+%labels
   CellProfiler 2.3.1
 
 %setup

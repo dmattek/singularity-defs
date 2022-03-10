@@ -39,7 +39,8 @@ From: ubuntu:20.04
     software-properties-common \
     dirmngr \
     cmake \
-    wget
+    wget \
+    git
   wget -qO- https://cloud.r-project.org/bin/linux/ubuntu/marutter_pubkey.asc | \
     tee -a /etc/apt/trusted.gpg.d/cran_ubuntu_key.asc
   add-apt-repository \
