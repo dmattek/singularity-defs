@@ -1,0 +1,79 @@
+# Installing Singularity under Debian Linux and derivatives:
+#
+#   sudo apt-get install singularity-container
+#
+#
+# Building Singularity container:
+#
+#   sudo singularity build --sandbox st shuttletracker-1.4.5-singularity.recipe
+#
+#
+# Running ShuttleTracker within the container:
+#
+#   singularity exec --writable st /opt/local/bin/ShuttleTracker
+#
+
+Bootstrap: docker
+From: ubuntu:disco
+
+%files
+
+%environment
+    export SHUTTLETRACKER_OPENCV_NUM_THREADS=2
+    export XDG_RUNTIME_DIR=/tmp
+
+%labels
+    AUTHOR shuttletracker.software@ippt.pan.pl
+
+%post
+    apt-get update
+
+    # This is a workaround to install 'tzdata' non-interactively.
+    ln -fs /usr/share/zoneinfo/Europe/London /etc/localtime
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get install -y tzdata
+    dpkg-reconfigure --frontend noninteractive tzdata
+
+    apt-get -y --no-install-recommends install wget cmake g++-9
+    apt-get -y --no-install-recommends install libopencv-dev libboost-all-dev \
+                                               qtbase5-dev qtbase5-dev-tools \
+                                               qttools5-dev qtscript5-dev
+    apt-get -y --no-install-recommends install xvfb mesa-utils libgl1-mesa-glx \
+                                               libgl1-mesa-dri fonts-cantarell \
+                                               fonts-dejavu fonts-dejavu-core fonts-dejavu-extra
+    apt-get -y --no-install-recommends install python3-numpy python3-pil \
+                                               python3-pandas python3-matplotlib
+    apt-get -y --no-install-recommends install nano
+    ( mkdir -p /opt/local/src  &&  cd /opt/local/src  && \
+      wget http://pmbm.ippt.pan.pl/software/shuttletracker/release/shuttletracker-1.4.5-source.tar.gz      && \
+      wget http://pmbm.ippt.pan.pl/software/shuttletracker/release/shuttletracker-1.4.5-source.tar.gz.md5  && \
+      md5sum -c shuttletracker-1.4.5-source.tar.gz.md5  && \
+      tar xfz shuttletracker-1.4.5-source.tar.gz  && \
+      cd shuttletracker-1.4.5-source  &&  mkdir build  &&  cd build  && \
+      cmake .. -DCMAKE_CXX_COMPILER=g++-9 \
+               -DCMAKE_BUILD_TYPE=Release \
+               -DCMAKE_INSTALL_PREFIX=/opt/local/  && \
+      make -j4  &&  make install  &&  rm -fR ../build/* )
+    apt-get -y purge git cmake g++-9
+    echo "Y" | apt autoremove -f
+    chmod 666 /opt/local/share/shuttletracker/config/settings.ini
+
+%help
+  This is a container with ShuttleTracker and required dependencies.
+  Available ENTRYPOINTS for singularity run --app xxx st.simg:
+  st - ShuttleTracker with GUI
+  st-nogui - ShuttleTracker run via xvfb (virtual framebuffer)
+  tiff_expander - python script to convert tiff stacks to ST format
+
+%runscript
+  exec echo "Try running with --app st/st-nogui/tiff_expander"
+
+%apprun st
+  exec /opt/local/bin/ShuttleTracker "$@"
+
+%apprun st-nogui
+  exec xvfb-run /opt/local/bin/ShuttleTracker "$@"
+
+%apprun tiff_expander
+  exec python3 /opt/local/share/shuttletracker/support/tiff_expander.py "$@"
+
