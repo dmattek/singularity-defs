@@ -6,7 +6,7 @@
 IMLOC=/opt/local/cellprofiler/cp2ubuntu.img
 
 # List of directories to bind with the image
-BNDDIR="-B /run -B /scratch -B /mnt/imaging.data -B /mnt/external.data"
+BNDDIR="-B /run -B /scratch -B /mnt/imaging.data -B /mnt/external.data -B /mnt/towbin.data -B /mnt/heussler.data"
 
 # execute "runscript" section of the image
 slurm-or-interactive singularity run $BNDDIR $IMLOC $@

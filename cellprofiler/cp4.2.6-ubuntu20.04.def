@@ -10,10 +10,13 @@ From: ubuntu:20.04
   This is a container with CellProfiler and required dependencies.
 
 %labels
-  CellProfiler 4.2.4
+  CellProfiler 4.2.6
 
 %setup
   hostname -f > $SINGULARITY_ROOTFS/etc/build_host
+  TZ=Europe/Stockholm
+  ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
+
 
 %post
     apt update 
@@ -62,7 +65,7 @@ From: ubuntu:20.04
 
     #git clone https://github.com/CellProfiler/CellProfiler
     #cd CellProfiler
-    pip3 install cellprofiler==4.2.4
+    pip3 install cellprofiler==4.2.6
 
 %environment
 
