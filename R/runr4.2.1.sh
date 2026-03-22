@@ -9,4 +9,4 @@ IMLOC=/opt/local/R/r.4.2.1.sif
 BNDDIR="-B /scratch -B /mnt/imaging.data -B /mnt/external.data -B /mnt/towbin.data -B /mnt/heussler.data -B /opt/local"
 
 # execute "runscript" section of the image
-slurm-or-interactive singularity run --app R $BNDDIR $IMLOC $@
+apptainer run --app R $BNDDIR $IMLOC $@

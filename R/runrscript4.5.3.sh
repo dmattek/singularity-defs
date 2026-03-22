@@ -3,7 +3,7 @@
 # Singularity wrapper script
 
 # Location of Singularity image
-IMLOC=/opt/local/R/rstudio.3.6.1.simg
+IMLOC=/opt/local/R/r-4.5.3.sif
 
 # List of directories to bind with the image
 BNDDIR="-B /scratch -B /mnt/imaging.data -B /mnt/external.data -B /mnt/towbin.data -B /mnt/heussler.data -B /opt/local"
